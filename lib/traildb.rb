@@ -150,9 +150,9 @@ module Traildb
       uuid = Traildb.uuid_raw(uuid)
       n = @ofields.size
       value_array = FFI::MemoryPointer.new(:string, n)
-      value_array.write_array_of_pointer(values.map{|v|FFI::MemoryPointer.from_string(v)})
+      value_array.write_array_of_pointer(values.map{|v|v.nil? ? nil : FFI::MemoryPointer.from_string(v)})
       value_lengths = FFI::MemoryPointer.new(:uint64, n)
-      value_lengths.write_array_of_uint64(values.map{|v|v.size})
+      value_lengths.write_array_of_uint64(values.map{|v|v.nil? ? 0 : v.size})
       ret = Traildb.tdb_cons_add(self, uuid, tstamp, value_array, value_lengths)
       raise TrailDBError.new("Too many values: %s" % values[ret]) if ret != 0
     end

@@ -414,4 +414,19 @@ class ConsTest < Test::Unit::TestCase
     assert_equal [123, 124], trail.map(&:time)
     assert_equal ['foobarbaz', 'barquuxmoo'], trail.map(&:field1)
   end
+
+  def test_add
+    uuid = '12345678-1234-5678-1234-567812345678'
+    cons = Traildb::TrailDBConstructor.new('testtrail', ['field1', 'field2'])
+    cons.add(uuid, 123, ['foo', nil])
+    cons.add(uuid, 124, [nil, 'bar'])
+    tdb = cons.finalize
+
+    assert_equal 2, tdb.num_events
+    uuid, trail = tdb.trails.to_a[0]
+    trail = trail.to_a
+    assert_equal [123, 124], trail.map(&:time)
+    assert_equal ['foo', ''], trail.map(&:field1)
+    assert_equal ['', 'bar'], trail.map(&:field2)
+  end
 end
